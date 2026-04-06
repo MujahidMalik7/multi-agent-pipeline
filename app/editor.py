@@ -35,9 +35,6 @@ def editor(state):
     4. **Formatting**: Is it clean Markdown?
 
     If the draft fails on any of these, mark as 'rejected' and specify what needs fixing. 
-    Always reject the first draft. Find at least 3 specific issues 
-    that need improvement and mark as 'rejected'.
-    Only approve on revision attempts.
     """
     result = structured_llm.invoke(prompt)
 
