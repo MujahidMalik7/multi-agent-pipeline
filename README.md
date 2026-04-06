@@ -12,7 +12,7 @@ The pipeline runs 4 specialized agents in sequence, each with a distinct job:
 START → Supervisor → Researcher → Supervisor → Outliner → Supervisor → Writer → Supervisor → Editor → Supervisor → END
                                                                                       ↑                    |
                                                                                       └────────────────────┘
-                                                                                         (if rejected)
+                                                                                         (if rejected, max 2 times)
 ```
 
 | Agent | Model | Job |
@@ -22,7 +22,7 @@ START → Supervisor → Researcher → Supervisor → Outliner → Supervisor �
 | **Writer** | Gemini 2.5 Flash Lite | Writes a full draft following the outline |
 | **Editor** | Claude Haiku | Reviews the draft for accuracy, completeness, tone, and formatting |
 
-The **Supervisor** is a Python routing function that reads shared state after each agent and decides who runs next. If the Editor rejects the draft, it sends the Writer a reason and loops back. After 3 rejections, the pipeline forces termination.
+The **Supervisor** is a Python routing function that reads shared state after each agent and decides who runs next. If the Editor rejects the draft, it sends the Writer a reason and loops back. The pipeline forces termination after **2 rejection cycles** (`revision_count >= 2`).
 
 ---
 
@@ -60,6 +60,11 @@ multi-agent-pipeline/
 ---
 
 ## Setup
+
+### Requirements
+
+- Python **3.10+** (required for `X | Y` union type syntax used throughout the codebase)
+- API keys for Anthropic, Groq, Google, Tavily, and LangSmith
 
 ### 1. Clone the repository
 
@@ -150,7 +155,7 @@ The Editor agent uses structured output (Pydantic) to return a strict `approved`
 Editor rejects → reason stored in state → Writer reads reason → improved draft → Editor re-reviews
 ```
 
-Maximum 3 revision attempts. After that, the pipeline terminates and returns the best available draft.
+Maximum **2 revision attempts**. After that, the pipeline terminates and returns the best available draft.
 
 ---
 
